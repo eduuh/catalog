@@ -1,5 +1,6 @@
 
 using catalog.Entities;
+using MongoDB.Bson;
 using MongoDB.Driver;
 
 namespace catalog.Repositories;
@@ -10,32 +11,38 @@ public class MongoDbItemsRepository : IInMemItemsRepository
    private const string collectionName = "items";
    private readonly IMongoCollection<Item> itemsCollection;
 
+   private readonly FilterDefinitionBuilder<Item> filterbuilder = Builders<Item>.Filter;
+
    public MongoDbItemsRepository(IMongoClient mongoClient)
    {
 	IMongoDatabase database = mongoClient.GetDatabase(databaseName);
         itemsCollection  = database.GetCollection<Item>(collectionName);
    }
-    public void CreateItem(Item item)
+    public void CreateItemAsync(Item item)
     {
+	itemsCollection.InsertOne(item);
     }
 
-    public void DeleteItem(Guid id)
+    public void DeleteItemAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var filter = filterbuilder.Eq(item => item.Id ,id);
+	itemsCollection.DeleteOne(filter);
     }
 
-    public Item GetItem(Guid id)
+    public Item GetItemAsync(Guid id)
     {
-        throw new NotImplementedException();
+        var filter = filterbuilder.Eq(item => item.Id ,id);
+	return itemsCollection.Find(filter).SingleOrDefault();
     }
 
-    public IEnumerable<Item> GetItems()
+    public IEnumerable<Item> GetItemsAsync()
     {
-        throw new NotImplementedException();
+       return itemsCollection.Find(new BsonDocument()).ToList();
     }
 
     public void UpdateItem(Item item)
     {
-        throw new NotImplementedException();
+        var filter = filterbuilder.Eq(existingitem => existingitem.Id, item.Id);
+	itemsCollection.ReplaceOne(filter, item);
     }
 }
