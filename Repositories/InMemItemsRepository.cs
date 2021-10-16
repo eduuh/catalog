@@ -12,30 +12,34 @@ public class InMemItemsRepository : IInMemItemsRepository
         new Item { Id = Guid.NewGuid(), Name = "Bronze Shield", Price = 16, CreatedDate = DateTimeOffset.UtcNow },
         new Item { Id = Guid.NewGuid(), Name = "Knife", Price = 20, CreatedDate = DateTimeOffset.UtcNow },
     };
-    public IEnumerable<Item> GetItemsAsync()
+    public async Task<IEnumerable<Item>> GetItemsAsync()
     {
-        return items;
+        return await Task.FromResult(items);
     }
 
-    public Item GetItemAsync(Guid id)
+    public async Task<Item> GetItemAsync(Guid id)
     {
-        return items.Where(item => item.Id == id).SingleOrDefault();
+        var item =  items.Where(item => item.Id == id).SingleOrDefault();
+	return await Task.FromResult(item);
     }
 
-    public void CreateItemAsync(Item item)
+    public async Task CreateItemAsync(Item item)
     {
         items.Add(item);
+	await Task.CompletedTask;
     }
 
-    public void UpdateItemAsync(Item item)
+    public async Task UpdateItemAsync(Item item)
     {
         var index = items.FindIndex(existingitem => existingitem.Id == item.Id);
 	items[index] = item;
+	await Task.CompletedTask;
     }
 
-    public void DeleteItemAsync(Guid id)
+    public async Task DeleteItemAsync(Guid id)
     {
         var index = items.FindIndex(existingitem => existingitem.Id == id);
 	items.RemoveAt(index);
+	await Task.CompletedTask;
     }
 }
