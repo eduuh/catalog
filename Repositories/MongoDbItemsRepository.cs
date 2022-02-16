@@ -26,7 +26,7 @@ public class MongoDbItemsRepository : IInMemItemsRepository
     public async Task DeleteItemAsync(Guid id)
     {
         var filter = filterbuilder.Eq(item => item.Id ,id);
-	await itemsCollection.DeleteOneAsync(filter);
+	    await itemsCollection.DeleteOneAsync(filter);
     }
 
     public async Task<Item> GetItemAsync(Guid id)
